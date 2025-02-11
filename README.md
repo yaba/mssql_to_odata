@@ -43,7 +43,10 @@ http://localhost:5000/odata/v4/{database}/{table_or_view}
 Pull requests are welcome! Feel free to open issues for bugs or feature requests.
 
 ## Support
-☕ Like this project? [![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20Me%20a%20Coffee&emoji=&slug=polido)](https://www.buymeacoffee.com/polido)
+☕ Like this project?
+
+[![Buy Me a Coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20Me%20a%20Coffee&emoji=☕&slug=polido&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/polido)
+
 
 
 
