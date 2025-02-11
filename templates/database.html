@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Objects - {{ database }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Database: {{ database }}</h1>
+            <a href="{{ url_for('index') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Back to Configuration
+            </a>
+        </div>
+
+        {% if error_message %}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <strong class="font-bold">Error:</strong>
+            <span class="block sm:inline">{{ error_message }}</span>
+        </div>
+        {% else %}
+        <div class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <h2 class="text-xl font-bold mb-4">Available Objects</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="px-4 py-2 text-left">Schema</th>
+                            <th class="px-4 py-2 text-left">Name</th>
+                            <th class="px-4 py-2 text-left">Type</th>
+                            <th class="px-4 py-2 text-left">OData URL</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obj in objects %}
+                        <tr class="hover:bg-gray-100">
+                            <td class="border px-4 py-2">{{ obj.schema }}</td>
+                            <td class="border px-4 py-2">{{ obj.name }}</td>
+                            <td class="border px-4 py-2">{{ obj.type }}</td>
+                            <td class="border px-4 py-2">
+                                <div class="flex items-center">
+                                    <input type="text" readonly
+                                        value="{{ base_url }}/odata/v4/{{ database }}/{{ obj.name }}"
+                                        class="flex-grow px-2 py-1 bg-gray-100 rounded mr-2">
+                                    <button onclick="copyUrl(this)"
+                                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm">
+                                        Copy
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function copyUrl(button) {
+                const input = button.parentElement.querySelector('input');
+                input.select();
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            }
+        </script>
+        {% endif %}
+    </div>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold">Database: {{ database }}</h1>
+        <div>
+            <a href="{{ url_for('list_databases') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded mr-2">
+                Back to Databases
+            </a>
+            <a href="{{ url_for('index') }}"
+                class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                Back to Configuration
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

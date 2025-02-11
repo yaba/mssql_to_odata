@@ -31,7 +31,7 @@ docker-compose up -d
 ```
 
 ## Configuration
-Upon first run, you will be prompted to configure your SQL Server details. These settings will be stored in a `config.json` file.
+Upon first run, you will be prompted to configure your SQL Server details. These settings will be stored in a `config/config.json` file.
 
 ## Accessing the OData Service
 Once running, access your data using:
