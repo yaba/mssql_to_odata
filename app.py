@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, make_response, render_template, redirect, url_for
 import pyodbc
-import urllib.parse
 import datetime
 from config import save_config, load_config
 import logging
