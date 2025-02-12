@@ -29,16 +29,34 @@
                 {% for database in databases %}
                 <div class="p-6 bg-white border rounded-lg shadow hover:bg-gray-50 transition-colors">
                     <h5 class="mb-2 text-xl font-bold tracking-tight text-gray-900">{{ database }}</h5>
-                    <input type="text" readonly
-                    value="{{ request.host_url }}odata/v4/{{ database }}/"
-                        class="flex-grow px-2 py-1 bg-gray-200 rounded mr-2 text-sm w-full">
-                    <a href="{{ url_for('database_objects', database=database) }}" class="font-normal text-blue-600 hover:underline">
+                    <div class="flex items-center space-x-2 w-full">
+                        <input type="text" readonly value="{{ request.host_url }}odata/v4/{{ database }}/"
+                            class="flex-grow px-2 py-1 bg-gray-200 rounded text-sm w-full">
+                        <button onclick="copyUrl(this)"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-xs">
+                            Copy
+                        </button>
+                    </div>
+                    <a href="{{ url_for('database_objects', database=database) }}"
+                        class="font-normal text-blue-600 hover:underline">
                         Click to view tables and views
                     </a>
                 </div>
                 {% endfor %}
             </div>
         </div>
+        <script>
+            function copyUrl(button) {
+                const input = button.parentElement.querySelector('input');
+                input.select();
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            }
+        </script>
+
         {% endif %}
     </div>
 </body>

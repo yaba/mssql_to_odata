@@ -2,26 +2,35 @@ from flask import Flask, jsonify, request, make_response, render_template, redir
 import pyodbc
 import datetime
 from config import save_config, load_config
+import urllib.parse
 import logging
 
 app = Flask(__name__)
 log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+log.setLevel(logging.WARNING)
 
 
-def get_db_connection(config=None):
-    """Create database connection using configuration"""
+def get_db_connection(config=None, database=None):
+    """Create a database connection using the given configuration."""
     if config is None:
         config = load_config()
 
-    connection_string = (
-        f"DRIVER={{{config['driver']}}};"
-        f"SERVER={config['server']};"
-        f"UID={config['username']};"
-        f"PWD={config['password']};"
-        "sslverify=0;encrypt=no;Trusted_Connection=No;"
-        "MARS_Connection=Yes;APP=ODataSQL"
-    )
+    connection_params = {
+        "DRIVER": f"{{{config['driver']}}}",
+        "SERVER": config["server"],
+        "UID": config["username"],
+        "PWD": config["password"],
+        "MARS_Connection": "Yes",
+        "APP": "ODataSQL",
+        "Trusted_Connection": "No",
+        "encrypt": "no",
+        "sslverify": "0",
+    }
+    if database:
+        connection_params["DATABASE"] = database
+
+    connection_string = ";".join(
+        f"{k}={v}" for k, v in connection_params.items())
     return pyodbc.connect(connection_string)
 
 
@@ -41,7 +50,6 @@ def get_database_objects(database):
     conn = get_db_connection(config)
     cursor = conn.cursor()
 
-    # Set the database context
     cursor.execute(f"USE {database}")
 
     query = """
@@ -129,6 +137,7 @@ def get_schema_info(conn, object_name):
     cursor = conn.cursor()
     columns = cursor.columns(table=object_name).fetchall()
     schema = []
+
     pk_columns = []
 
     try:
@@ -226,7 +235,8 @@ def get_schema_info(conn, object_name):
 def get_service_document(database):
     """Return the OData service document with available tables and views"""
     try:
-        conn = get_db_connection(database)
+        config = load_config()
+        conn = get_db_connection(config, database)
         cursor = conn.cursor()
 
         query = """
@@ -267,7 +277,8 @@ def get_service_document(database):
 def get_object_data(database, object_name):
     """Return data from tables or views in OData v4 format"""
     try:
-        conn = get_db_connection(database)
+        config = load_config()
+        conn = get_db_connection(config, database)
         cursor = conn.cursor()
 
         verify_query = """
@@ -279,7 +290,6 @@ def get_object_data(database, object_name):
         if not cursor.fetchone():
             return jsonify({"error": "Object not found or not accessible"}), 404
 
-        # Basic query, could be enhanced with OData query options
         query = f"SELECT * FROM {object_name}"
         cursor.execute(query)
 
@@ -322,7 +332,8 @@ def get_object_data(database, object_name):
 def get_metadata(database):
     """Return the EDM metadata document for both tables and views"""
     try:
-        conn = get_db_connection(database)
+        config = load_config()
+        conn = get_db_connection(config, database)
         cursor = conn.cursor()
 
         query = """
@@ -344,7 +355,9 @@ def get_metadata(database):
         for obj in objects:
             object_name = obj.name
             schema = get_schema_info(conn, object_name)
+
             metadata.append(f'            <EntityType Name="{object_name}">')
+
             key_properties = [col for col in schema if col['is_key']]
             if key_properties:
                 metadata.append('                <Key>')
@@ -352,6 +365,7 @@ def get_metadata(database):
                     metadata.append(
                         f'                    <PropertyRef Name="{key_prop["name"]}" />')
                 metadata.append('                </Key>')
+
             for column in schema:
                 nullable = 'true' if column['nullable'] else 'false'
                 metadata.append(

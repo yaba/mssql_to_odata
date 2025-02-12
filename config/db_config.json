@@ -1,6 +1,6 @@
 {
-    "server": "",
-    "username": "",
-    "password": "",
+    "server": "10.81.20.100",
+    "username": "sa",
+    "password": "Suporte#1981",
     "driver": "ODBC Driver 18 for SQL Server"
 }
