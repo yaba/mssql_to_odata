@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  mssql-to-odata:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - sqlodatacfg:/app/config
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+volumes:
+  sqlodatacfg:
